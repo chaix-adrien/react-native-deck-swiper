@@ -36,7 +36,7 @@ const rebuildStackAnimatedValues = (props) => {
 }
 
 class Swiper extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -116,10 +116,16 @@ class Swiper extends Component {
 
   initializePanResponder = () => {
     this._panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: (event, gestureState) => true,
-      onMoveShouldSetPanResponder: (event, gestureState) => false,
 
       onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
+        if (evt.nativeEvent.touches.length >= 2)
+          return false
+        if (gestureState.dx >= 0.01 && gestureState.dy < 1 && gestureState.dy > -1) {
+          return true
+        }
+        if (gestureState.dx <= -0.01 && gestureState.dy < 1 && gestureState.dy > -1) {
+          return true
+        }
         const isVerticalSwipe = Math.sqrt(
           Math.pow(gestureState.dx, 2) < Math.pow(gestureState.dy, 2)
         )
@@ -362,7 +368,7 @@ class Swiper extends Component {
     if (!canSwipeBack) {
       return
     }
-    this.setState({isSwipingBack: !isSwipingBack, swipeBackXYPositions}, () => {
+    this.setState({ isSwipingBack: !isSwipingBack, swipeBackXYPositions }, () => {
       this.animatePreviousCard(this.calculateNextPreviousCardPosition(), cb)
     })
   }
@@ -436,10 +442,10 @@ class Swiper extends Component {
   }
 
   setSwipeBackCardXY = (x = -width, y = 0, cb) => {
-    this.setState({swipeBackXYPositions: [...this.state.swipeBackXYPositions, {x, y}]}, cb)
+    this.setState({ swipeBackXYPositions: [...this.state.swipeBackXYPositions, { x, y }] }, cb)
   }
 
-  animatePreviousCard = ({x, y}, cb) => {
+  animatePreviousCard = ({ x, y }, cb) => {
     const { previousCardX, previousCardY } = this.state
     previousCardX.setValue(x * SWIPE_MULTIPLY_FACTOR)
     previousCardY.setValue(y * SWIPE_MULTIPLY_FACTOR)
@@ -457,7 +463,7 @@ class Swiper extends Component {
         useNativeDriver: true
       })
     ]).start(() => {
-      this.setState({isSwipingBack: false})
+      this.setState({ isSwipingBack: false })
       this.decrementCardIndex(cb)
     })
   }
@@ -562,7 +568,7 @@ class Swiper extends Component {
   }
 
   resetPanAndScale = () => {
-    const {previousCardDefaultPositionX, previousCardDefaultPositionY} = this.props
+    const { previousCardDefaultPositionX, previousCardDefaultPositionY } = this.props
     this.state.pan.setValue({ x: 0, y: 0 })
     this.state.previousCardX.setValue(previousCardDefaultPositionX)
     this.state.previousCardY.setValue(previousCardDefaultPositionY)
